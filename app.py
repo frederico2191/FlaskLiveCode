@@ -38,6 +38,12 @@ def addPerson():
     resposeBody = {"id":1,"name": body['name']+ " Created!!!"}
     return jsonify(resposeBody)
 
+@app.route("/api/person/", methods=['PUT'])
+def updatePerson():
+    body = request.get_json()
+    resposeBody = {"id":body['id'],"name": body['name']+ " Update!!!"}
+    return jsonify(resposeBody)
+
 
 
 app.run(host='0.0.0.0')
