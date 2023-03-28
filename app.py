@@ -14,9 +14,11 @@ def myRootMethod():
 
 @app.route("/api/person/")
 def getPersons():
-    people = [{"id":1, "name":"Carlos Muniz"},
-    {"id":2, "name":"Bruno"}]
-    return jsonify(people)
+    persons = PersonModel.query.all()
+    result = []
+    for person in persons:
+        result.append(person.serialize())
+    return jsonify(result)
 
 
 @app.route("/api/person/<int:id>")
@@ -41,8 +43,11 @@ def deletePerson(id):
 @app.route("/api/person/", methods=['POST'])
 def addPerson():
     body = request.get_json()
-    resposeBody = {"id":1,"name": body['name']+ " Created!!!"}
-    return jsonify(resposeBody)
+    myobj = PersonModel()
+    myobj.name = body['name']
+    db.session.add(myobj)
+    db.session.commit()
+    return '',204
 
 @app.route("/api/person/", methods=['PUT'])
 def updatePerson():
@@ -52,4 +57,4 @@ def updatePerson():
 
 
 
-app.run(host='0.0.0.0')
+app.run(host='0.0.0.0', port='1234')
