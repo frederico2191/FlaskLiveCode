@@ -1,6 +1,12 @@
 from flask import Flask, jsonify, request
+from PersonModel import db, PersonModel
 
 app = Flask(__name__)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///MyDBTest.db'
+db.init_app(app)
+with app.app_context():
+    db.create_all()
 
 @app.route("/")
 def myRootMethod():
