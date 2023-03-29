@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-from PersonModel import db, PersonModel, Films, Character
+from PersonModel import db, PersonModel, Films, Character, Planets
 
 app = Flask(__name__)
 
@@ -10,9 +10,9 @@ with app.app_context():
 
 @app.route("/")
 def myRootMethod():
-    return "Hello World"
+    return "This is home!"
 
-@app.route("/api/films/")
+@app.route("/api/films/", methods=['GET'])
 def getFilms():
     films = Films.query.all()
     result = []
@@ -21,8 +21,7 @@ def getFilms():
         filtered_character= Character.query.filter_by(film_id = film.id)
         for c in filtered_character:
             characters.append("/people/"+c.people_id)
-
-        result.append({id: film.id, 'characters': characters})
+        result.append({'id': film.id, 'characters': characters})
     return jsonify(result)
 
 @app.route("/api/films/", methods=['POST'])
@@ -35,34 +34,40 @@ def addFilm():
     return '',204
 
 
-# @app.route("/api/people/<int:people_id>")
-# def getPerson(id):
-#     people = people.query.all()
-#     for i in people:
-#         if i = id:
-#             content.append(people)
-#         resp = jsonify(content)
-#         resp.status_code = 404
-#         return resp
-#     person = {"id":id, "name":"Carlos Muniz"}
-#     return jsonify(person)
+@app.route("/api/people/<int:people_id>", methods=['GET'])
+def getPerson(id):
+    people = People.query.all()
+    content = []
+    for i in people:
+        if i == id:
+            content.append(people)
+        resp = jsonify(content)
+        resp.status_code = 404
+        return resp
+    return jsonify(person)
 
-# @app.route("/api/person/<int:id>", methods=['DELETE'])
-# def deletePerson(id):
-#     if id == 10:
-#         content = {"details": "Hey, there has been an error on your request"}
-#         resp = jsonify(content)
-#         resp.status_code = 404
-#         return resp
-#     return '',204
+@app.route("/api/person/<int:people_id>", methods=['DELETE'])
+def deletePerson(id):
+    if Person.query.get(id) != None:
+        person = Person.query.get(id)
+        db.session.delete(person)
+        db.session.commit()
+        return 'deleted!',204
+    else:
+        content = {"details": "Hey, there has been an error on your request"}
+        resp = jsonify(content)
+        resp.status_code = 404
+        return resp
+   
 
-
-
-# @app.route("/api/person/", methods=['PUT'])
-# def updatePerson():
-#     body = request.get_json()
-#     resposeBody = {"id":body['id'],"name": body['name']+ " Update!!!"}
-#     return jsonify(resposeBody)
+@app.route("/api/person/<int:people_id>", methods=['PUT'])
+def updatePerson(id,name):
+    person = Person.query.get(id)
+    person.name = name
+    db.session.commit()
+    body = request.get_json()
+    resposeBody = {"id":body['id'],"name": body['name']+ " Update!!!"}
+    return jsonify(resposeBody)
 
 
 
